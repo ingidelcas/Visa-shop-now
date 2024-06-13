@@ -1,0 +1,67 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet id="productService-0" author="idelcas">
+        <sql>
+            CREATE TABLE IF NOT EXISTS shopnow.categories
+            (
+            category_id BIGSERIAL NOT NULL PRIMARY KEY,
+            category_title VARCHAR(255) NOT NULL,
+            created_at TIMESTAMP NOT NULL DEFAULT current_timestamp,
+            updated_at TIMESTAMP NOT NULL DEFAULT current_timestamp
+            );
+        </sql>
+        <rollback>
+            DROP TABLE shopnow.categories;
+        </rollback>
+    </changeSet>
+
+    <changeSet id="productService-1" author="idelcas">
+        <sql>
+            CREATE TABLE IF NOT EXISTS shopnow.products
+            (
+            product_id BIGSERIAL NOT NULL PRIMARY KEY,
+            product_name VARCHAR(255) NOT NULL,
+            price NUMERIC(10,2) NOT NULL,
+            description VARCHAR(255) ,
+            quantity integer ,
+            category_id BIGSERIAL NOT NULL,
+            created_at TIMESTAMP NOT NULL DEFAULT current_timestamp,
+            updated_at TIMESTAMP NOT NULL DEFAULT current_timestamp
+
+            );
+        </sql>
+        <rollback>
+            DROP TABLE shopnow.products;
+        </rollback>
+    </changeSet>
+
+
+    <changeSet author="idelcas" id="productService-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <customPrecondition className="com.ctp.liquibase.ForeignKeyExistsPrecondition">
+                    <param name="schemaName" value="shopnow"/>
+                    <param name="tableName" value="products"/>
+                    <param name="columnName" value="category_id"/>
+                    <param name="foreignTableName" value="categories"/>
+                </customPrecondition>
+            </not>
+        </preConditions>
+
+        <addForeignKeyConstraint baseColumnNames="category_id"
+                                 baseTableName="products"
+                                 baseTableSchemaName="shopnow"
+                                 constraintName="fk_product_categories"
+                                 deferrable="true"
+                                 initiallyDeferred="true"
+                                 onDelete="CASCADE"
+                                 onUpdate="RESTRICT"
+                                 referencedColumnNames="category_id"
+                                 referencedTableName="categories"
+                                 referencedTableSchemaName="shopnow"
+        />
+    </changeSet>
+</databaseChangeLog>

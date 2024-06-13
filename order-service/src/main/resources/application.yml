@@ -1,0 +1,47 @@
+server:
+  port: 8082
+  # graceful shutdown makes sure we have time to finnish any ongoing rest requests before terminating
+  # default value will be 30s before terminating
+  shutdown: graceful
+
+spring:
+  threads:
+    virtual:
+      enabled: true #To enable virtual threads in Spring Boot 3.2 we just need to set this property
+  application:
+    name: shopNow
+  datasource:
+    url: jdbc:postgresql://localhost:5432/shopnow?prepareThreshold=0
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: postgre
+    hikari.connectionTimeout: 100000
+    hikari.idleTimeout: 600000
+    hikari.maxLifetime: 1800000
+  session:
+    redis:
+      namespace:  session
+    store-type: redis
+  redis:
+    host: localhost
+    port: 6379
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog-master.xml
+
+  jpa:
+    show-sql: true
+
+springdoc:
+  api-docs:
+    path: /orderService-docs
+  swagger-ui:
+    path: /orderService-docs/swagger-ui-custom.html
+
+logging.level:
+  root: INFO
+  liquibase: INFO
+
+PRODUCT_SERVICE_URL:  http://localhost:8081/
+USER_SERVICE_URL:  http://localhost:8080/
