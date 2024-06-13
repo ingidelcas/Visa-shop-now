@@ -18,54 +18,27 @@ spring:
             - Path=/api/manager/**
         # PRODUCT-SERVICE
         - id: product-categories
-          uri: http://localhost:8081/
+          uri: http://localhost:8081
           predicates:
             - Path=/api/categories/**
 
         - id: product-products
-          uri: http://localhost:8081/
+          uri: http://localhost:8081
           predicates:
             - Path=/api/products/**
 
         - id: product-admin
-          uri: http://localhost:8081/
+          uri: http://localhost:8081
           predicates:
-            - Path=/admin/products**
+            - Path=/admin/products/**
 
         # ORDER-SERVICE
         - id: order-service-carts
-          uri: http://localhost:8082/
+          uri: http://localhost:8082
           predicates:
             - Path=/api/cart/**
 
         - id: order-service-orders
-          uri: http://localhost:8082/
+          uri: http://localhost:8082
           predicates:
             - Path=/api/order/**
-
-
-
-
-
-
-        - id: user-server
-          uri: http://localhost:8080
-          predicates:
-            - Path=/api/auth/**, /api/manager/**
-          filters:
-            - RewritePath=/api/auth/signup*, /
-
-        - id: serv-hoteles
-          uri: lb://servicio-hoteles
-          predicates:
-            - Path=/shoteles/**
-          filters:
-            - RewritePath=/shoteles/*, /
-        - id: serv-reservas
-          uri: lb://servicio-reserva
-          predicates:
-            - Path=/sreservas/**
-          filters:
-            - RewritePath=/sreservas/*, /
-
-
