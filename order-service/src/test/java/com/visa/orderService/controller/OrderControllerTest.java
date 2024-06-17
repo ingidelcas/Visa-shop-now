@@ -1,10 +1,11 @@
 package com.visa.orderService.controller;
 
 import com.google.gson.Gson;
+import com.visa.lib.entity.Auth.UserAccount;
 import com.visa.lib.entity.Item;
 import com.visa.lib.entity.Order;
 import com.visa.lib.entity.Product;
-import com.visa.lib.entity.auth.UserAccount;
+
 import com.visa.orderService.dto.ItemRequestDto;
 import com.visa.orderService.feignclient.UserClient;
 import com.visa.orderService.service.CartService;
@@ -24,9 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -76,14 +75,14 @@ public class OrderControllerTest {
         user.setUserName(USER_NAME);
 
         Item item = new Item();
-        item.setProduct(product);
+        item.setProductId(PRODUCT_ID);
         item.setQuantity(1);
-        List<Item> cart = new ArrayList<Item>();
+        Set<Item> cart = new HashSet<>();
         cart.add(item);
 
         Order order = new Order();
         order.setItems(cart);
-        order.setUser(user);
+        order.setUserId(user.getUserId());
 
 
         ItemRequestDto itemDto = new ItemRequestDto(PRODUCT_ID, 1);

@@ -11,6 +11,7 @@
             quantity integer NOT NULL,
             subTotal bigint NOT NULL,
             product_id BIGSERIAL NOT NULL,
+            order_id BIGSERIAL NOT NULL,
             created_at TIMESTAMP NOT NULL DEFAULT current_timestamp,
             updated_at TIMESTAMP NOT NULL DEFAULT current_timestamp
             );
@@ -38,96 +39,17 @@
         </rollback>
     </changeSet>
 
-    <changeSet id="order-2" author="idelcas">
-        <sql>
-            CREATE TABLE IF NOT EXISTS shopnow.carts
-            (
-            item_id BIGSERIAL NOT NULL,
-            order_id BIGSERIAL NOT NULL,
-            created_at TIMESTAMP NOT NULL DEFAULT current_timestamp,
-            updated_at TIMESTAMP NOT NULL DEFAULT current_timestamp
-
-            );
-        </sql>
-        <rollback>
-            DROP TABLE shopnow.user_role;
-        </rollback>
-    </changeSet>
-
-    <changeSet author="idelcas" id="order-3">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <customPrecondition className="com.ctp.liquibase.ForeignKeyExistsPrecondition">
-                    <param name="schemaName" value="shopnow"/>
-                    <param name="tableName" value="items"/>
-                    <param name="columnName" value="product_id"/>
-                    <param name="foreignTableName" value="products"/>
-                </customPrecondition>
-            </not>
-        </preConditions>
-
-        <addForeignKeyConstraint baseColumnNames="product_id"
+    <changeSet author="idelcas" id="order-5">
+        <addForeignKeyConstraint baseColumnNames="order_id"
                                  baseTableName="items"
                                  baseTableSchemaName="shopnow"
-                                 constraintName="fk_items_products"
-                                 deferrable="true"
-                                 initiallyDeferred="true"
-                                 onDelete="CASCADE"
-                                 onUpdate="RESTRICT"
-                                 referencedColumnNames="product_id"
-                                 referencedTableName="products"
-                                 referencedTableSchemaName="shopnow"
-        />
-    </changeSet>
-
-
-
-    <changeSet author="idelcas" id="order-5">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <customPrecondition className="com.ctp.liquibase.ForeignKeyExistsPrecondition">
-                    <param name="schemaName" value="shopnow"/>
-                    <param name="tableName" value="carts"/>
-                    <param name="columnName" value="order_id"/>
-                    <param name="foreignTableName" value="orders"/>
-                </customPrecondition>
-            </not>
-        </preConditions>
-        <addForeignKeyConstraint baseColumnNames="order_id"
-                                 baseTableName="carts"
-                                 baseTableSchemaName="shopnow"
-                                 constraintName="fk_order_id"
+                                 constraintName="fk_order_item"
                                  deferrable="true"
                                  initiallyDeferred="true"
                                  onDelete="CASCADE"
                                  onUpdate="RESTRICT"
                                  referencedColumnNames="order_id"
                                  referencedTableName="orders"
-                                 referencedTableSchemaName="shopnow"
-        />
-    </changeSet>
-
-    <changeSet author="idelcas" id="order-6">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <customPrecondition className="com.ctp.liquibase.ForeignKeyExistsPrecondition">
-                    <param name="schemaName" value="shopnow"/>
-                    <param name="tableName" value="carts"/>
-                    <param name="columnName" value="item_id"/>
-                    <param name="foreignTableName" value="items"/>
-                </customPrecondition>
-            </not>
-        </preConditions>
-        <addForeignKeyConstraint baseColumnNames="item_id"
-                                 baseTableName="carts"
-                                 baseTableSchemaName="shopnow"
-                                 constraintName="fk_item_id"
-                                 deferrable="true"
-                                 initiallyDeferred="true"
-                                 onDelete="CASCADE"
-                                 onUpdate="RESTRICT"
-                                 referencedColumnNames="item_id"
-                                 referencedTableName="items"
                                  referencedTableSchemaName="shopnow"
         />
     </changeSet>

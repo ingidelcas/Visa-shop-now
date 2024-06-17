@@ -7,8 +7,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.visa.productService.controller", "com.visa.productService.services"
-		, "com.visa.lib.config"
+@ComponentScan(basePackages = {"com.visa.userService.controller", "com.visa.userService..services"
+		, "com.visa.lib.config, com.visa.lib.exceptions"
 })
 @EntityScan(basePackages = {"com.visa.lib.entity"})
 @EnableJpaRepositories(basePackages = {"com.visa.lib.repository"})

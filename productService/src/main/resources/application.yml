@@ -11,7 +11,7 @@ spring:
   application:
     name: shopNow
   datasource:
-    url: jdbc:postgresql://localhost:5432/shopnow?prepareThreshold=0
+    url: jdbc:postgresql://192.168.5.105:5432/visa-product?prepareThreshold=0
     driver-class-name: org.postgresql.Driver
     username: postgres
     password: postgre
@@ -35,4 +35,6 @@ springdoc:
 logging.level:
   root: INFO
   liquibase: INFO
+
+USER_SERVICE_URL:  http://192.168.5.105:9000/
 

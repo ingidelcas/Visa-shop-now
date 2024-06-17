@@ -21,6 +21,14 @@
         <jwt.version>0.12.3</jwt.version>
     </properties>
 
+    <distributionManagement>
+        <repository>
+            <id>internal.repo</id>
+            <name>Custom Visa Repository</name>
+            <url>file://${project.build.directory}/lib</url>
+        </repository>
+    </distributionManagement>
+
     <dependencies>
 
         <!-- REST/webmvc -->
@@ -33,6 +41,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+
 
         <!-- DB -->
         <dependency>
@@ -117,10 +131,24 @@
         <!--custom dependencies-->
         <dependency>
             <groupId>com.visa</groupId>
-            <artifactId>shopNow-data-model-lib</artifactId>
-            <version>${shopNow-data-model-lib-version}</version>
+            <artifactId>shopNow-common-lib</artifactId>
+            <version>0.0.1</version>
         </dependency>
+
+
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 
     <build>

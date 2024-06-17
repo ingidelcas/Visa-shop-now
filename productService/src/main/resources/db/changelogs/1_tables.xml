@@ -40,17 +40,6 @@
 
 
     <changeSet author="idelcas" id="productService-2">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <customPrecondition className="com.ctp.liquibase.ForeignKeyExistsPrecondition">
-                    <param name="schemaName" value="shopnow"/>
-                    <param name="tableName" value="products"/>
-                    <param name="columnName" value="category_id"/>
-                    <param name="foreignTableName" value="categories"/>
-                </customPrecondition>
-            </not>
-        </preConditions>
-
         <addForeignKeyConstraint baseColumnNames="category_id"
                                  baseTableName="products"
                                  baseTableSchemaName="shopnow"

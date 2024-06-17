@@ -1,8 +1,9 @@
 package com.visa.userService.security;
 
-import com.visa.lib.entity.auth.UserAccount;
-import com.visa.lib.exceptions.NotFoundException;
+
+import com.visa.lib.entity.Auth.UserAccount;
 import com.visa.lib.repository.auth.UserAccountRepository;
+import com.visa.userService.exceptions.NotFoundException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserAccountRepository repository;
+
 
     public UserDetailsServiceImpl(UserAccountRepository repository) {
         this.repository = repository;
@@ -35,5 +37,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .authorities(mappedAuthorities.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()))
                 .build();
     }
+
 
 }

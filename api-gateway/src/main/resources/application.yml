@@ -8,37 +8,37 @@ spring:
       routes:
         # USER-SERVICE
         - id: user-service-auth
-          uri: http://localhost:8080
+          uri: http://192.168.5.105:9000
           predicates:
             - Path=/api/auth/**
 
         - id: user-service-manager
-          uri: http://localhost:8080
+          uri: http://192.168.5.105:9000
           predicates:
             - Path=/api/manager/**
         # PRODUCT-SERVICE
         - id: product-categories
-          uri: http://localhost:8081
+          uri: http://192.168.5.105:9001
           predicates:
             - Path=/api/categories/**
 
         - id: product-products
-          uri: http://localhost:8081
+          uri: http://192.168.5.105:9001
           predicates:
             - Path=/api/products/**
 
         - id: product-admin
-          uri: http://localhost:8081
+          uri: http://192.168.5.105:9001
           predicates:
             - Path=/admin/products/**
 
         # ORDER-SERVICE
         - id: order-service-carts
-          uri: http://localhost:8082
+          uri: http://192.168.5.105:9002
           predicates:
             - Path=/api/cart/**
 
         - id: order-service-orders
-          uri: http://localhost:8082
+          uri: http://192.168.5.105:9002
           predicates:
             - Path=/api/order/**

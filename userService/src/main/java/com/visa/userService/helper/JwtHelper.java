@@ -2,7 +2,7 @@ package com.visa.userService.helper;
 
 
 import com.visa.lib.Utils.Constant;
-import com.visa.lib.exceptions.AccessDeniedException;
+import com.visa.userService.exceptions.AccessDeniedException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -34,13 +34,6 @@ public class JwtHelper {
                 .expiration(new Date(System.currentTimeMillis() + Constant.LIFE_TIME))
                 .signWith(Keys.hmacShaKeyFor(Constant.SECRET_KEY.getBytes()))
                 .compact();
-//        return Jwts.builder().setIssuedAt(Date.from(now)) // fecha creación
-//                .setSubject(authentication.getName()) // usuario
-//                .claim("authorities", authentication.getAuthorities().stream() // roles
-//                        .map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
-//                .setExpiration(new Date(System.currentTimeMillis() + Constant.LIFE_TIME)) // fecha caducidad
-//                .signWith(Keys.hmacShaKeyFor(Constant.SECRET_KEY.getBytes()))// clave y algoritmo para firma
-//                .compact();
     }
 
 
@@ -75,5 +68,22 @@ public class JwtHelper {
     private static SecretKey getSignInKey() {
         byte[] bytes = Constant.SECRET_KEY.getBytes();
         return new SecretKeySpec(bytes, "HmacSHA256");
+    }
+
+    public static String reduceTokenExpiration(String token) {
+        // Decode the token to extract its claims
+        Claims claims = Jwts.parser()
+                .verifyWith(getSignInKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        // Build a new token with the updated expiration time
+        return Jwts.builder()
+                .claims(claims)
+                // the token will be expired in 10 hours
+                .expiration(new Date(0))
+                .signWith(getSignInKey(), Jwts.SIG.HS256)
+                .compact();
     }
 }

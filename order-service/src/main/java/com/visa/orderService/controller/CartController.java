@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 
 @RestController
@@ -25,27 +26,27 @@ public class CartController {
     private HeaderGenerator headerGenerator;
 
     @GetMapping
-    public ResponseEntity<List<Item>> getCart(@RequestParam(value = "order") Long order) {
-        List<Item> cart = cartService.getAllItemsFromCart(order);
+    public ResponseEntity<Set<Item>> getCart(@RequestParam(value = "order") Long order) {
+       Set<Item> cart = cartService.getAllItemsFromCart(order);
         if (!cart.isEmpty()) {
-            return new ResponseEntity<List<Item>>(
+            return new ResponseEntity<Set<Item>>(
                     cart,
                     headerGenerator.getHeadersForSuccessGetMethod(),
                     HttpStatus.OK);
         }
-        return new ResponseEntity<List<Item>>(
+        return new ResponseEntity<Set<Item>>(
                 headerGenerator.getHeadersForError(),
                 HttpStatus.NOT_FOUND);
     }
 
     @PostMapping(params = {"order"})
-    public ResponseEntity<List<Item>> addItemToCart(
+    public ResponseEntity<Set<Item>> addItemToCart(
             @RequestParam(value = "order") Long order,
             @RequestBody ItemRequestDto itemsDto,
             HttpServletRequest request) {
-        List<Item> cart = cartService.addItemToCart(order, itemsDto.getProduct(), itemsDto.getQuantity());
+        Set<Item> cart = cartService.addItemToCart(order, itemsDto.getProduct(), itemsDto.getQuantity());
 
-        return new ResponseEntity<List<Item>>(
+        return new ResponseEntity<Set<Item>>(
                 cart,
                 headerGenerator.getHeadersForSuccessGetMethod(),
                 HttpStatus.OK);
@@ -69,7 +70,7 @@ public class CartController {
     @DeleteMapping(value = "/item", params = "itemId")
     public ResponseEntity<Void> removeItemFromCart(
             @RequestParam("itemId") Long cartId) {
-        List<Item> cart = cartService.getAllItemsFromCart(cartId);
+        Set<Item> cart = cartService.getAllItemsFromCart(cartId);
         if (cart != null) {
             cartService.deleteItemFromCart(cartId);
             return new ResponseEntity<Void>(

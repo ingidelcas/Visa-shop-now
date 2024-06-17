@@ -2,15 +2,14 @@
 package com.visa.userService.controller;
 
 import com.visa.lib.DTO.ApiErrorResponse;
-import com.visa.lib.entity.auth.LoginAttempt;
+import com.visa.lib.entity.Auth.UserAccount;
 import com.visa.userService.helper.JwtHelper;
 import com.visa.userService.model.dto.LoginAttemptResponse;
 import com.visa.userService.model.dto.LoginRequest;
 import com.visa.userService.model.dto.LoginResponse;
 import com.visa.userService.model.dto.SignupRequest;
+import com.visa.userService.service.LoginService;
 import com.visa.userService.service.UserService;
-import com.visa.userService.service.impl.LoginService;
-import com.visa.userService.service.impl.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -27,9 +26,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @RestController
 @RequestMapping(path = "/api/auth", produces = MediaType.APPLICATION_JSON_VALUE)
 public class AuthController {
@@ -38,11 +34,14 @@ public class AuthController {
 
     @Autowired
     private UserService userServiceImpl;
-    private final LoginService loginService;
 
-    public AuthController(AuthenticationManager authenticationManager, LoginService loginService) {
+    @Autowired
+    private LoginService loginServiceImpl;
+
+
+    public AuthController(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
-        this.loginService = loginService;
+
     }
 
     @Operation(summary = "Signup user")
@@ -52,7 +51,8 @@ public class AuthController {
     @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     @PostMapping("/signup")
     public ResponseEntity<Void> signup(@Valid @RequestBody SignupRequest requestDto) {
-        userServiceImpl.signup(requestDto);
+        UserAccount user = userServiceImpl.signup(requestDto);
+        loginServiceImpl.addLoginAttempt(user);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -64,16 +64,14 @@ public class AuthController {
     @PostMapping(value = "/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         try {
-            Authentication authentication =   authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.username(), request.password()));
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.username(), request.password()));
             if (authentication.isAuthenticated()) {
                 String token = JwtHelper.generateToken(authentication);
-                loginService.addLoginAttempt(request.username(), true);
                 return ResponseEntity.ok(new LoginResponse(request.username(), token));
-            }else {
-                throw  new AuthException("unauthenticated");
+            } else {
+                throw new AuthException("unauthenticated");
             }
         } catch (BadCredentialsException e) {
-            loginService.addLoginAttempt(request.username(), false);
             throw e;
         } catch (AuthException e) {
             throw new RuntimeException(e);
@@ -82,21 +80,27 @@ public class AuthController {
 
     }
 
+    @Operation(summary = "Logs out the authenticated user.")
+    @ApiResponse(responseCode = "200", description = "Logged out successfully", content = @Content(schema = @Schema(implementation = String.class)))
+    @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(implementation = ResponseEntity.class)))
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout() {
+        userServiceImpl.logout();
+        return ResponseEntity.status(HttpStatus.OK).build();
+
+    }
+
+
     @Operation(summary = "Get recent login attempts")
     @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = LoginResponse.class)))
     @ApiResponse(responseCode = "403", content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
-//forbidden
     @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     @GetMapping(value = "/loginAttempts")
-    public ResponseEntity<List<LoginAttemptResponse>> loginAttempts(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<LoginAttemptResponse> loginAttempts(@RequestHeader("Authorization") String token) {
         String email = JwtHelper.extractUsername(token.replace("Bearer ", ""));
-        var loginAttempts = loginService.findRecentLoginAttempts(email);
-        return ResponseEntity.ok(convertToDTOs(loginAttempts));
+
+        return ResponseEntity.ok(loginServiceImpl.findRecentLoginAttempts(email));
     }
 
-    private List<LoginAttemptResponse> convertToDTOs(List<LoginAttempt> loginAttempts) {
-        return loginAttempts.stream()
-                .map(LoginAttemptResponse::convertToDTO)
-                .collect(Collectors.toList());
-    }
+
 }

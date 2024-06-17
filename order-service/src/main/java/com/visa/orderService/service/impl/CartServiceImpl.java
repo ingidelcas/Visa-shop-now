@@ -10,14 +10,15 @@ import com.visa.lib.repository.OrderRepository;
 import com.visa.orderService.feignclient.ProductClient;
 import com.visa.orderService.service.CartService;
 import com.visa.orderService.utilities.CartUtilities;
+import com.visa.orderService.utilities.OrderUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class CartServiceImpl implements CartService {
@@ -32,7 +33,7 @@ public class CartServiceImpl implements CartService {
     private OrderRepository orderRepository;
 
     @Override
-    public List<Item> addItemToCart(Long orderId, Integer productId, Integer quantity) {
+    public Set<Item> addItemToCart(Long orderId, Integer productId, Integer quantity) {
         Product product = Optional.ofNullable(productClient.getProductById(productId))
                 .orElseThrow(() -> new NotFoundException(String.format("Product with id[%d] not found", productId)));
 
@@ -41,17 +42,36 @@ public class CartServiceImpl implements CartService {
 
         Item item = Item.builder()
                 .quantity(quantity)
-                .product(product)
-                .orders(Collections.singletonList(order))
+                .productId(product.getProductId())
+                .orders(order)
                 .subTotal(CartUtilities.getSubTotalForItem(product, quantity))
                 .build();
-        cartRepository.save(item);
+        item.setCreateAt(Instant.now());
+        item.setUpdateAt(Instant.now());
+        item = cartRepository.save(item);
+        order.setTotal(OrderUtilities.countTotalPrice(Collections.singleton(item)));
+        order.getItems().add(item);
+        orderRepository.save(order);
         return order.getItems();
     }
 
     @Override
-    public List<Item> getAllItemsFromCart(Long orderId) {
-        return new ArrayList<>(cartRepository.findByOrdersId(orderId));
+    public Item addItemToCar(Order order, Product product, Integer quantity) {
+        Item item = Item.builder()
+                .quantity(quantity)
+                .productId(product.getProductId())
+                .orders(order)
+                .subTotal(CartUtilities.getSubTotalForItem(product, quantity))
+                .build();
+        item.setCreateAt(Instant.now());
+        item.setUpdateAt(Instant.now());
+        return cartRepository.save(item);
+
+    }
+
+    @Override
+    public Set<Item> getAllItemsFromCart(Long orderId) {
+        return new HashSet<>(cartRepository.findByOrdersId(orderId));
     }
 
     @Override
@@ -59,8 +79,11 @@ public class CartServiceImpl implements CartService {
         Item item = Optional.ofNullable(cartRepository.findByIdAndProductId(cartId, productId))
                 .orElseThrow(() -> new NotFoundException(String.format("Item with id[%d] not found", cartId)));
 
+        Product product = Optional.ofNullable(productClient.getProductById(productId))
+                .orElseThrow(() -> new NotFoundException(String.format("Product with id[%d] not found", productId)));
+
         item.setQuantity(quantity);
-        item.setSubTotal(CartUtilities.getSubTotalForItem(item.getProduct(), quantity));
+        item.setSubTotal(CartUtilities.getSubTotalForItem(product, quantity));
         item.setUpdateAt(Instant.now());
         return cartRepository.save(item);
     }
@@ -86,12 +109,4 @@ public class CartServiceImpl implements CartService {
     }
 
 
-    @Override
-    public void deleteCart(Long orderId) {
-
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new NotFoundException(String.format("Item with id[%d] not found", orderId)));
-
-        orderRepository.delete(order);
-    }
 }

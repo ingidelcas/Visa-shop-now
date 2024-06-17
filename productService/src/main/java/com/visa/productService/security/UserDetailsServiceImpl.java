@@ -1,8 +1,11 @@
 package com.visa.productService.security;
 
-import com.visa.lib.entity.auth.UserAccount;
+
+import com.visa.lib.entity.Auth.UserAccount;
 import com.visa.lib.repository.auth.UserAccountRepository;
 import com.visa.productService.exception.NotFoundException;
+import com.visa.productService.feignclient.UserClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -15,6 +18,9 @@ import java.util.stream.Collectors;
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
+    @Autowired
+    private UserClient userClient;
+
     private final UserAccountRepository repository;
 
     public UserDetailsServiceImpl(UserAccountRepository repository) {
@@ -24,9 +30,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String userName) {
         Collection<String> mappedAuthorities = new ArrayList<>();
-
-        UserAccount user = repository.findByUsername(userName).orElseThrow(() ->
-                new NotFoundException(String.format("User does not exist, user name: %s", userName)));
+        UserAccount user = userClient.getUserByName(userName);
         user.getRoles().forEach(rol -> mappedAuthorities.add(rol.getName().name()));
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUserName())

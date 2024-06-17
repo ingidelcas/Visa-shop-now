@@ -18,9 +18,16 @@
         <java.version>17</java.version>
         <spring-doc.version>2.2.0</spring-doc.version>
         <spring-cloud.version>2023.0.2</spring-cloud.version>
-        <shopNow-data-model-lib-version>0.0.1</shopNow-data-model-lib-version>
         <jwt.version>0.12.3</jwt.version>
     </properties>
+
+    <distributionManagement>
+        <repository>
+            <id>internal.repo</id>
+            <name>Custom Visa Repository</name>
+            <url>file://${project.build.directory}/lib</url>
+        </repository>
+    </distributionManagement>
 
     <dependencies>
         <!-- REST/webmvc -->
@@ -130,8 +137,8 @@
         <!--custom dependencies-->
         <dependency>
             <groupId>com.visa</groupId>
-            <artifactId>shopNow-data-model-lib</artifactId>
-            <version>${shopNow-data-model-lib-version}</version>
+            <artifactId>shopNow-common-lib</artifactId>
+            <version>0.0.1</version>
         </dependency>
     </dependencies>
 

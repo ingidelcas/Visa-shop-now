@@ -1,8 +1,9 @@
 package com.visa.userService.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.visa.lib.DTO.ApiErrorResponse;
-import com.visa.lib.exceptions.AccessDeniedException;
+import com.visa.userService.exceptions.AccessDeniedException;
 import com.visa.userService.helper.JwtHelper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

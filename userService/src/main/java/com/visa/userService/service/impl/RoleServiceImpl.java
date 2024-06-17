@@ -1,9 +1,10 @@
 package com.visa.userService.service.impl;
 
-import com.visa.lib.entity.auth.Role;
-import com.visa.lib.entity.auth.RoleName;
-import com.visa.lib.entity.auth.UserAccount;
-import com.visa.lib.exceptions.NotFoundException;
+
+import com.visa.lib.entity.Auth.Role;
+import com.visa.lib.entity.Auth.RoleName;
+import com.visa.lib.entity.Auth.UserAccount;
+import com.visa.userService.exceptions.NotFoundException;
 import com.visa.lib.repository.auth.RoleRepository;
 import com.visa.lib.repository.auth.UserAccountRepository;
 import com.visa.userService.service.RoleService;

@@ -1,8 +1,8 @@
 package com.visa.userService.controller;
 
 import com.visa.lib.DTO.ApiErrorResponse;
-import com.visa.lib.exceptions.DuplicateException;
-import com.visa.lib.exceptions.NotFoundException;
+import com.visa.userService.exceptions.DuplicateException;
+import com.visa.userService.exceptions.NotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;

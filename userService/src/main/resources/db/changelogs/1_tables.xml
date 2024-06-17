@@ -3,7 +3,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
 
-    <changeSet id="20240806-0" author="idelcas">
+    <changeSet id="user-0" author="idelcas">
         <sql>
             CREATE TABLE IF NOT EXISTS shopnow.roles
             (
@@ -16,7 +16,7 @@
         </rollback>
     </changeSet>
 
-    <changeSet id="20240806-1" author="idelcas">
+    <changeSet id="user-1" author="idelcas">
         <sql>
             CREATE TABLE IF NOT EXISTS shopnow.person
             (
@@ -34,12 +34,13 @@
         </rollback>
     </changeSet>
 
-    <changeSet id="20240806-2" author="idelcas">
+    <changeSet id="user-2" author="idelcas">
         <sql>
             CREATE TABLE IF NOT EXISTS shopnow.user_account
             (
             user_id BIGSERIAL NOT NULL PRIMARY KEY,
             user_name VARCHAR(255) NOT NULL,
+            enabled BOOLEAN NOT NULL,
             password VARCHAR(255) NOT NULL,
             person_id BIGSERIAL
 
@@ -49,18 +50,7 @@
             DROP TABLE shopnow.person;
         </rollback>
     </changeSet>
-    <changeSet author="idelcas" id="20240806-3">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <customPrecondition className="com.ctp.liquibase.ForeignKeyExistsPrecondition">
-                    <param name="schemaName" value="shopnow"/>
-                    <param name="tableName" value="user_account"/>
-                    <param name="columnName" value="person_id"/>
-                    <param name="foreignTableName" value="person"/>
-                </customPrecondition>
-            </not>
-        </preConditions>
-
+    <changeSet author="idelcas" id="user-3">
         <addForeignKeyConstraint baseColumnNames="person_id"
                                  baseTableName="user_account"
                                  baseTableSchemaName="shopnow"
@@ -75,7 +65,8 @@
         />
     </changeSet>
 
-    <changeSet id="20240806-5" author="idelcas">
+
+    <changeSet id="user-4" author="idelcas">
         <sql>
             CREATE TABLE IF NOT EXISTS shopnow.user_role
             (
@@ -89,7 +80,7 @@
         </rollback>
     </changeSet>
 
-    <changeSet author="idelcas" id="20240806-6">
+    <changeSet author="idelcas" id="user-5">
         <addPrimaryKey
                 columnNames="user_id, role_id"
                 constraintName="pk_user_rol"
@@ -98,42 +89,7 @@
         />
     </changeSet>
 
-    <changeSet author="idelcas" id="20240806-7">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <customPrecondition className="com.ctp.liquibase.ForeignKeyExistsPrecondition">
-                    <param name="schemaName" value="shopnow"/>
-                    <param name="tableName" value="user_role"/>
-                    <param name="columnName" value="role_id"/>
-                    <param name="foreignTableName" value="roles"/>
-                </customPrecondition>
-            </not>
-        </preConditions>
-        <addForeignKeyConstraint baseColumnNames="role_id"
-                                 baseTableName="user_role"
-                                 baseTableSchemaName="shopnow"
-                                 constraintName="fk_role_id"
-                                 deferrable="true"
-                                 initiallyDeferred="true"
-                                 onDelete="CASCADE"
-                                 onUpdate="RESTRICT"
-                                 referencedColumnNames="role_id"
-                                 referencedTableName="roles"
-                                 referencedTableSchemaName="shopnow"
-        />
-    </changeSet>
-
-    <changeSet author="idelcas" id="20240806-4">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <customPrecondition className="com.ctp.liquibase.ForeignKeyExistsPrecondition">
-                    <param name="schemaName" value="shopnow"/>
-                    <param name="tableName" value="user_role"/>
-                    <param name="columnName" value="user_id"/>
-                    <param name="foreignTableName" value="user_account"/>
-                </customPrecondition>
-            </not>
-        </preConditions>
+    <changeSet author="idelcas" id="20240806-6">
         <addForeignKeyConstraint baseColumnNames="user_id"
                                  baseTableName="user_role"
                                  baseTableSchemaName="shopnow"
@@ -148,21 +104,52 @@
         />
     </changeSet>
 
+    <changeSet author="idelcas" id="user-7">
+        <addForeignKeyConstraint baseColumnNames="role_id"
+                                 baseTableName="user_role"
+                                 baseTableSchemaName="shopnow"
+                                 constraintName="fk_role_id"
+                                 deferrable="true"
+                                 initiallyDeferred="true"
+                                 onDelete="CASCADE"
+                                 onUpdate="RESTRICT"
+                                 referencedColumnNames="role_id"
+                                 referencedTableName="roles"
+                                 referencedTableSchemaName="shopnow"
+        />
+    </changeSet>
 
 
-    <changeSet id="20240806-9" author="idelcas">
+    <changeSet id="user-9" author="idelcas">
         <sql>
             CREATE TABLE IF NOT EXISTS shopnow.login_attempt
             (
             id BIGSERIAL NOT NULL PRIMARY KEY,
-            username VARCHAR(255) NOT NULL,
-            success BOOLEAN DEFAULT false,
-            created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+            user_id BIGSERIAL NOT NULL,
+            failed_attempt INTEGER,
+            account_non_locked BOOLEAN,
+            lock_time DATE
+
             );
         </sql>
         <rollback>
             DROP TABLE shopnow.login_attempt;
         </rollback>
+    </changeSet>
+
+    <changeSet author="idelcas" id="user-10">
+        <addForeignKeyConstraint baseColumnNames="user_id"
+                                 baseTableName="login_attempt"
+                                 baseTableSchemaName="shopnow"
+                                 constraintName="fk_user_attempt"
+                                 deferrable="true"
+                                 initiallyDeferred="true"
+                                 onDelete="CASCADE"
+                                 onUpdate="RESTRICT"
+                                 referencedColumnNames="user_id"
+                                 referencedTableName="user_account"
+                                 referencedTableSchemaName="shopnow"
+        />
     </changeSet>
 
     <changeSet id="20240806-8" author="idelcas">
